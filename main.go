@@ -1,6 +1,19 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
+type Recipe struct {
+	Id           string    `json:"id"`
+	Name         string    `json:"name"`
+	Keywords     []string  `json:"keywords"`
+	Ingridents   []string  `json:"ingridents"`
+	Instructions []string  `json:"instructions"`
+	PublishedAt  time.Time `json:"publishedAt"`
+}
 
 func IndexHandler(c *gin.Context) {
 	username := c.Params.ByName("username")
