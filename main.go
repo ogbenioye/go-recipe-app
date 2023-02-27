@@ -24,6 +24,10 @@ func init() {
 	recipes = make([]Recipe, 0)
 }
 
+func ListAllRecipeHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
+}
+
 func NewRecipeHandler(c *gin.Context) {
 	var recipe Recipe
 
@@ -45,6 +49,6 @@ func NewRecipeHandler(c *gin.Context) {
 func main() {
 	router := gin.Default()
 	router.POST("/recipe", NewRecipeHandler)
-
+	router.GET("/recipe", ListAllRecipeHandler)
 	router.Run()
 }
