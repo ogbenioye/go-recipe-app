@@ -1,30 +1,50 @@
 package main
 
 import (
+	"net/http"
 	"time"
+
+	"github.com/rs/xid"
 
 	"github.com/gin-gonic/gin"
 )
+
+var recipes []Recipe
 
 type Recipe struct {
 	Id           string    `json:"id"`
 	Name         string    `json:"name"`
 	Keywords     []string  `json:"keywords"`
-	Ingridents   []string  `json:"ingridents"`
+	Ingredients  []string  `json:"ingredients"`
 	Instructions []string  `json:"instructions"`
 	PublishedAt  time.Time `json:"publishedAt"`
 }
 
-func IndexHandler(c *gin.Context) {
-	username := c.Params.ByName("username")
-	c.JSON(200, gin.H{
-		"message": "Hello," + username,
-	})
+func init() {
+	recipes = make([]Recipe, 0)
+}
+
+func NewRecipeHandler(c *gin.Context) {
+	var recipe Recipe
+
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	recipe.Id = xid.New().String()
+	recipe.PublishedAt = time.Now()
+
+	recipes = append(recipes, recipe)
+
+	c.JSON(http.StatusOK, recipe)
 }
 
 func main() {
 	router := gin.Default()
-	router.GET("/:username", IndexHandler)
+	router.POST("/recipe", NewRecipeHandler)
 
 	router.Run()
 }
