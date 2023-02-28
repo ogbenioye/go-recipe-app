@@ -24,6 +24,39 @@ func init() {
 	recipes = make([]Recipe, 0)
 }
 
+func UpdateRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+
+	var recipe Recipe
+
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	index := -1
+
+	for i := 0; i < len(recipes); i++ {
+		if recipes[i].Id == id {
+			index = i
+		}
+	}
+
+	if index == -1 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Recipe not found",
+		})
+		return
+	}
+
+	// recipe.Id = id
+	recipes[index] = recipe
+
+	c.JSON(http.StatusOK, recipe)
+}
+
 func ListAllRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
@@ -50,5 +83,6 @@ func main() {
 	router := gin.Default()
 	router.POST("/recipe", NewRecipeHandler)
 	router.GET("/recipe", ListAllRecipeHandler)
+	router.PUT("/recipe/:id", UpdateRecipeHandler)
 	router.Run()
 }
